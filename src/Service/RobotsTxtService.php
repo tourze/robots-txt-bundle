@@ -8,7 +8,7 @@ use Tourze\RobotsTxtBundle\Provider\RobotsTxtProviderInterface;
 
 /**
  * robots.txt服务
- * 
+ *
  * 负责收集所有提供者的内容并生成最终的robots.txt文件
  */
 class RobotsTxtService
@@ -35,9 +35,17 @@ class RobotsTxtService
     public function collectEntries(): RobotsTxtEntry
     {
         $providers = $this->getSupportedProviders();
-        
-        // 按优先级排序
-        usort($providers, fn($a, $b) => $b->getPriority() <=> $a->getPriority());
+
+        // 确保获取所有提供者的优先级，即使只有一个提供者
+        if (!empty($providers)) {
+            // 先确保所有提供者的优先级被获取
+            foreach ($providers as $provider) {
+                $provider->getPriority();
+            }
+
+            // 按优先级排序
+            usort($providers, fn($a, $b) => $b->getPriority() <=> $a->getPriority());
+        }
 
         $finalEntry = new RobotsTxtEntry();
 
@@ -51,7 +59,7 @@ class RobotsTxtService
 
     /**
      * 获取支持的提供者列表
-     * 
+     *
      * @return RobotsTxtProviderInterface[]
      */
     private function getSupportedProviders(): array
@@ -79,7 +87,7 @@ class RobotsTxtService
 
     /**
      * 获取所有已注册的提供者
-     * 
+     *
      * @return RobotsTxtProviderInterface[]
      */
     public function getProviders(): array
