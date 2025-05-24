@@ -1,0 +1,11 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+
+  Tourze\RobotsTxtBundle\Controller\:
+    resource: '../../Controller/'
+  Tourze\RobotsTxtBundle\Provider\:
+    resource: '../../Provider/'
+  Tourze\RobotsTxtBundle\Service\:
+    resource: '../../Service/'
