@@ -21,7 +21,7 @@ class RobotsTxtRule
 
     /**
      * 创建针对所有爬虫的规则
-     * 
+     *
      * @param RobotsTxtDirective[] $directives
      */
     public static function forAllAgents(array $directives, int $priority = 0): self
@@ -31,7 +31,7 @@ class RobotsTxtRule
 
     /**
      * 创建针对特定爬虫的规则
-     * 
+     *
      * @param RobotsTxtDirective[] $directives
      */
     public static function forAgent(string $userAgent, array $directives, int $priority = 0): self
@@ -53,7 +53,7 @@ class RobotsTxtRule
 
     /**
      * 添加多个指令
-     * 
+     *
      * @param RobotsTxtDirective[] $directives
      */
     public function withDirectives(array $directives): self

@@ -107,7 +107,6 @@ class DefaultRobotsTxtProviderTest extends TestCase
         $entry = $this->provider->provide();
         
         $this->assertNotEmpty($entry->comments);
-        $this->assertIsString($entry->comments[0]);
         $this->assertStringContainsString('Generated', $entry->comments[0]);
     }
 

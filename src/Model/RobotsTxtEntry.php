@@ -33,7 +33,7 @@ class RobotsTxtEntry
 
     /**
      * 添加多个规则
-     * 
+     *
      * @param RobotsTxtRule[] $rules
      */
     public function withRules(array $rules): self
@@ -59,7 +59,7 @@ class RobotsTxtEntry
 
     /**
      * 添加多个站点地图
-     * 
+     *
      * @param string[] $sitemaps
      */
     public function withSitemaps(array $sitemaps): self
