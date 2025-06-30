@@ -10,7 +10,7 @@ use Tourze\RobotsTxtBundle\Model\RobotsTxtEntry;
  *
  * 实现此接口的服务可以为robots.txt文件提供内容
  */
-#[AutoconfigureTag('robots_txt.provider')]
+#[AutoconfigureTag(name: 'robots_txt.provider')]
 interface RobotsTxtProviderInterface
 {
     /**

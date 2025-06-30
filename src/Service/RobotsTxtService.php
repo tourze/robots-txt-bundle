@@ -16,7 +16,7 @@ class RobotsTxtService
     /**
      * @param iterable<RobotsTxtProviderInterface> $providers
      */
-    public function __construct(#[TaggedIterator('robots_txt.provider')] private readonly iterable $providers = [])
+    public function __construct(#[TaggedIterator(tag: 'robots_txt.provider')] private readonly iterable $providers = [])
     {
     }
 

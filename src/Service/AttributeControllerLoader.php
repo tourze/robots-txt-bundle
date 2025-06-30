@@ -9,7 +9,7 @@ use Symfony\Component\Routing\RouteCollection;
 use Tourze\RobotsTxtBundle\Controller\RobotsTxtController;
 use Tourze\RoutingAutoLoaderBundle\Service\RoutingAutoLoaderInterface;
 
-#[AutoconfigureTag('routing.loader')]
+#[AutoconfigureTag(name: 'routing.loader')]
 class AttributeControllerLoader extends Loader implements RoutingAutoLoaderInterface
 {
     private AttributeRouteControllerLoader $controllerLoader;
