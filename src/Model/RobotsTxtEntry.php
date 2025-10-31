@@ -8,14 +8,14 @@ namespace Tourze\RobotsTxtBundle\Model;
 class RobotsTxtEntry
 {
     /**
-     * @param RobotsTxtRule[] $rules 规则列表
-     * @param string[] $sitemaps 站点地图URL列表
-     * @param string[] $comments 注释列表
+     * @param RobotsTxtRule[] $rules    规则列表
+     * @param string[]        $sitemaps 站点地图URL列表
+     * @param string[]        $comments 注释列表
      */
     public function __construct(
         public readonly array $rules = [],
         public readonly array $sitemaps = [],
-        public readonly array $comments = []
+        public readonly array $comments = [],
     ) {
     }
 
@@ -102,32 +102,38 @@ class RobotsTxtEntry
     {
         $lines = [];
 
-        // 添加注释
+        $lines = array_merge($lines, $this->getCommentsLines());
+        $lines = array_merge($lines, $this->getRulesLines());
+        $lines = array_merge($lines, $this->getSitemapsLines());
+
+        return implode("\n", $lines);
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getCommentsLines(): array
+    {
+        $lines = [];
         foreach ($this->comments as $comment) {
             $lines[] = '# ' . $comment;
         }
 
-        if (!empty($this->comments) && (!empty($this->rules) || !empty($this->sitemaps))) {
+        if (count($this->comments) > 0 && (count($this->rules) > 0 || count($this->sitemaps) > 0)) {
             $lines[] = '';
         }
 
-        // 按优先级排序规则
-        $sortedRules = $this->rules;
-        usort($sortedRules, fn($a, $b) => $b->priority <=> $a->priority);
+        return $lines;
+    }
 
-        // 按User-agent分组规则
-        $groupedRules = [];
-        foreach ($sortedRules as $rule) {
-            if (!isset($groupedRules[$rule->userAgent])) {
-                $groupedRules[$rule->userAgent] = [];
-            }
-            $groupedRules[$rule->userAgent] = array_merge(
-                $groupedRules[$rule->userAgent],
-                $rule->directives
-            );
-        }
+    /**
+     * @return string[]
+     */
+    private function getRulesLines(): array
+    {
+        $lines = [];
+        $groupedRules = $this->groupRulesByUserAgent();
 
-        // 输出分组的规则
         $ruleIndex = 0;
         foreach ($groupedRules as $userAgent => $directives) {
             if ($ruleIndex > 0) {
@@ -139,12 +145,43 @@ class RobotsTxtEntry
                 $lines[] = $directive->toString();
             }
 
-            $ruleIndex++;
+            ++$ruleIndex;
         }
 
-        // 添加站点地图
-        if (!empty($this->sitemaps)) {
-            if (!empty($lines)) {
+        return $lines;
+    }
+
+    /**
+     * @return array<string, RobotsTxtDirective[]>
+     */
+    private function groupRulesByUserAgent(): array
+    {
+        $sortedRules = $this->rules;
+        usort($sortedRules, fn ($a, $b) => $b->priority <=> $a->priority);
+
+        $groupedRules = [];
+        foreach ($sortedRules as $rule) {
+            if (!isset($groupedRules[$rule->userAgent])) {
+                $groupedRules[$rule->userAgent] = [];
+            }
+            $groupedRules[$rule->userAgent] = array_merge(
+                $groupedRules[$rule->userAgent],
+                $rule->directives
+            );
+        }
+
+        return $groupedRules;
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getSitemapsLines(): array
+    {
+        $lines = [];
+        if (count($this->sitemaps) > 0) {
+            // Add separator if we have previous content
+            if (count($this->comments) > 0 || count($this->rules) > 0) {
                 $lines[] = '';
             }
 
@@ -153,7 +190,7 @@ class RobotsTxtEntry
             }
         }
 
-        return implode("\n", $lines);
+        return $lines;
     }
 
     public function __toString(): string

@@ -9,7 +9,7 @@ use Tourze\RobotsTxtBundle\Service\RobotsTxtService;
 /**
  * robots.txt控制器
  */
-class RobotsTxtController
+final class RobotsTxtController
 {
     public function __construct(private readonly RobotsTxtService $robotsTxtService)
     {

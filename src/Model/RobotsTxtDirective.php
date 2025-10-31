@@ -9,7 +9,7 @@ class RobotsTxtDirective
 {
     public function __construct(
         public readonly string $directive,
-        public readonly string $value
+        public readonly string $value,
     ) {
     }
 

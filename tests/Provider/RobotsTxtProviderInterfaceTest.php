@@ -1,14 +1,26 @@
 <?php
 
-namespace Tourze\RobotsTxtBundle\Tests\Unit\Provider;
+namespace Tourze\RobotsTxtBundle\Tests\Provider;
 
-use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Tourze\PHPUnitSymfonyKernelTest\AbstractIntegrationTestCase;
 use Tourze\RobotsTxtBundle\Model\RobotsTxtEntry;
 use Tourze\RobotsTxtBundle\Provider\RobotsTxtProviderInterface;
 
-class RobotsTxtProviderInterfaceTest extends TestCase
+/**
+ * @internal
+ */
+#[CoversClass(RobotsTxtProviderInterface::class)]
+#[RunTestsInSeparateProcesses]
+final class RobotsTxtProviderInterfaceTest extends AbstractIntegrationTestCase
 {
-    public function test_interface_can_be_implemented(): void
+    protected function onSetUp(): void
+    {
+        // 接口测试不需要特殊设置
+    }
+
+    public function testInterfaceCanBeImplemented(): void
     {
         $provider = new class implements RobotsTxtProviderInterface {
             public function provide(): RobotsTxtEntry
@@ -33,7 +45,7 @@ class RobotsTxtProviderInterfaceTest extends TestCase
         $this->assertTrue($provider->supports());
     }
 
-    public function test_interface_methods_exist(): void
+    public function testInterfaceMethodsExist(): void
     {
         $reflection = new \ReflectionClass(RobotsTxtProviderInterface::class);
 

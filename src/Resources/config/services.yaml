@@ -9,3 +9,7 @@ services:
     resource: '../../Provider/'
   Tourze\RobotsTxtBundle\Service\:
     resource: '../../Service/'
+  
+  # 为测试明确配置 AttributeControllerLoader 服务
+  Tourze\RobotsTxtBundle\Service\AttributeControllerLoader:
+    public: true

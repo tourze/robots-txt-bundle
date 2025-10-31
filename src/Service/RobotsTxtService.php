@@ -2,7 +2,7 @@
 
 namespace Tourze\RobotsTxtBundle\Service;
 
-use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Tourze\RobotsTxtBundle\Model\RobotsTxtEntry;
 use Tourze\RobotsTxtBundle\Provider\RobotsTxtProviderInterface;
 
@@ -16,7 +16,7 @@ class RobotsTxtService
     /**
      * @param iterable<RobotsTxtProviderInterface> $providers
      */
-    public function __construct(#[TaggedIterator(tag: 'robots_txt.provider')] private readonly iterable $providers = [])
+    public function __construct(#[AutowireIterator(tag: 'robots_txt.provider')] private readonly iterable $providers = [])
     {
     }
 
@@ -26,6 +26,7 @@ class RobotsTxtService
     public function generate(): string
     {
         $entry = $this->collectEntries();
+
         return $entry->toString();
     }
 
@@ -35,26 +36,69 @@ class RobotsTxtService
     public function collectEntries(): RobotsTxtEntry
     {
         $providers = $this->getSupportedProviders();
-
-        // 确保获取所有提供者的优先级，即使只有一个提供者
-        if (!empty($providers)) {
-            // 先确保所有提供者的优先级被获取
-            foreach ($providers as $provider) {
-                $provider->getPriority();
-            }
-
-            // 按优先级排序
-            usort($providers, fn($a, $b) => $b->getPriority() <=> $a->getPriority());
-        }
+        $sortedProviders = $this->sortProvidersByPriority($providers);
 
         $finalEntry = new RobotsTxtEntry();
 
-        foreach ($providers as $provider) {
+        foreach ($sortedProviders as $provider) {
             $entry = $provider->provide();
             $finalEntry = $finalEntry->merge($entry);
         }
 
         return $finalEntry;
+    }
+
+    /**
+     * 按优先级排序提供者
+     *
+     * @param RobotsTxtProviderInterface[] $providers
+     * @return RobotsTxtProviderInterface[]
+     */
+    private function sortProvidersByPriority(array $providers): array
+    {
+        if (0 === count($providers)) {
+            return [];
+        }
+
+        // 先确保所有提供者的优先级被获取
+        $this->prefetchProviderPriorities($providers);
+
+        // 按优先级排序
+        return $this->sortProvidersByPriorityValue($providers);
+    }
+
+    /**
+     * 预取所有提供者的优先级
+     *
+     * @param RobotsTxtProviderInterface[] $providers
+     */
+    private function prefetchProviderPriorities(array $providers): void
+    {
+        foreach ($providers as $provider) {
+            $provider->getPriority();
+        }
+    }
+
+    /**
+     * 根据优先级值排序提供者
+     *
+     * @param RobotsTxtProviderInterface[] $providers
+     * @return RobotsTxtProviderInterface[]
+     */
+    private function sortProvidersByPriorityValue(array $providers): array
+    {
+        usort($providers, function (RobotsTxtProviderInterface $a, RobotsTxtProviderInterface $b): int {
+            $priorityA = $a->getPriority();
+            $priorityB = $b->getPriority();
+
+            if ($priorityA === $priorityB) {
+                return 0;
+            }
+
+            return $priorityA > $priorityB ? -1 : 1;
+        });
+
+        return $providers;
     }
 
     /**
@@ -82,7 +126,8 @@ class RobotsTxtService
     {
         $entry = $this->collectEntries();
         $content = $entry->toString();
-        return empty(trim($content));
+
+        return '' === trim($content);
     }
 
     /**

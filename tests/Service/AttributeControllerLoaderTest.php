@@ -1,19 +1,25 @@
 <?php
 
-namespace Tourze\RobotsTxtBundle\Test\Service;
+namespace Tourze\RobotsTxtBundle\Tests\Service;
 
-use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Routing\RouteCollection;
+use Tourze\PHPUnitSymfonyKernelTest\AbstractIntegrationTestCase;
 use Tourze\RobotsTxtBundle\Service\AttributeControllerLoader;
 
-class AttributeControllerLoaderTest extends TestCase
+/**
+ * @internal
+ */
+#[CoversClass(AttributeControllerLoader::class)]
+#[RunTestsInSeparateProcesses]
+final class AttributeControllerLoaderTest extends AbstractIntegrationTestCase
 {
     private AttributeControllerLoader $loader;
 
-    protected function setUp(): void
+    protected function onSetUp(): void
     {
-        parent::setUp();
-        $this->loader = new AttributeControllerLoader();
+        $this->loader = self::getService(AttributeControllerLoader::class);
     }
 
     public function testSupportsReturnsFalse(): void
@@ -25,15 +31,15 @@ class AttributeControllerLoaderTest extends TestCase
     public function testAutoloadReturnsRouteCollection(): void
     {
         $collection = $this->loader->autoload();
-        
+
         $this->assertInstanceOf(RouteCollection::class, $collection);
         $this->assertGreaterThan(0, $collection->count());
-        
+
         // 验证路由包含 robots.txt 路由
         $routes = $collection->all();
         $hasRobotsTxtRoute = false;
         foreach ($routes as $route) {
-            if ($route->getPath() === '/robots.txt') {
+            if ('/robots.txt' === $route->getPath()) {
                 $hasRobotsTxtRoute = true;
                 break;
             }
@@ -44,7 +50,7 @@ class AttributeControllerLoaderTest extends TestCase
     public function testLoadCallsAutoload(): void
     {
         $collection = $this->loader->load('resource');
-        
+
         $this->assertInstanceOf(RouteCollection::class, $collection);
         $this->assertGreaterThan(0, $collection->count());
     }

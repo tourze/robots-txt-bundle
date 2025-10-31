@@ -4,17 +4,29 @@ namespace Tourze\RobotsTxtBundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+use Tourze\SymfonyDependencyServiceLoader\AutoExtension;
 
-class RobotsTxtExtension extends Extension
+class RobotsTxtExtension extends AutoExtension
 {
+    protected function getConfigDir(): string
+    {
+        return __DIR__ . '/../Resources/config';
+    }
+
     public function load(array $configs, ContainerBuilder $container): void
     {
-        $loader = new YamlFileLoader(
-            $container,
-            new FileLocator(__DIR__ . '/../Resources/config')
-        );
-        $loader->load('services.yaml');
+        parent::load($configs, $container);
+
+        // 加载环境特定的配置
+        $loader = new YamlFileLoader($container, new FileLocator($this->getConfigDir()));
+
+        if ('dev' === $container->getParameter('kernel.environment')) {
+            $loader->load('services_dev.yaml');
+        }
+
+        if ('test' === $container->getParameter('kernel.environment')) {
+            $loader->load('services_test.yaml');
+        }
     }
 }

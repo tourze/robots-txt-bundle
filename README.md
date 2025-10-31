@@ -1,29 +1,93 @@
 # RobotsTxt Bundle
 
-一个用于管理 `robots.txt` 文件的 Symfony Bundle，支持多提供者架构，可以灵活地组装和生成 robots.txt 内容。
+[English](README.md) | [中文](README.zh-CN.md)
 
-## 特性
+[![Latest Version](https://img.shields.io/packagist/v/tourze/robots-txt-bundle.svg?style=flat-square)](
+https://packagist.org/packages/tourze/robots-txt-bundle)
+[![PHP Version](https://img.shields.io/packagist/php-v/tourze/robots-txt-bundle.svg?style=flat-square)](
+https://packagist.org/packages/tourze/robots-txt-bundle)
+[![Total Downloads](https://img.shields.io/packagist/dt/tourze/robots-txt-bundle.svg?style=flat-square)](
+https://packagist.org/packages/tourze/robots-txt-bundle)
+[![License](https://img.shields.io/packagist/l/tourze/robots-txt-bundle.svg?style=flat-square)](LICENSE)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/tourze/robots-txt-bundle/ci.yml?style=flat-square)](
+https://github.com/tourze/robots-txt-bundle/actions)
+[![Code Coverage](https://img.shields.io/codecov/c/github/tourze/robots-txt-bundle?style=flat-square)](
+https://codecov.io/gh/tourze/robots-txt-bundle)
 
-- 🤖 **完整的 robots.txt 支持**：支持所有标准指令（User-agent、Allow、Disallow、Crawl-delay、Sitemap等）
-- 🔌 **多提供者架构**：通过实现 `RobotsTxtProviderInterface` 可以从多个来源收集规则
-- 🎯 **优先级控制**：支持提供者优先级，灵活控制规则合并顺序
-- 🌍 **环境支持**：可以根据不同环境提供不同的 robots.txt 内容
-- ⚡ **性能优化**：内置缓存策略，减少服务器负载
-- 📖 **符合规范**：遵循 [Google robots.txt 规范](https://developers.google.com/search/docs/crawling-indexing/robots/robots_txt)
+A Symfony Bundle for managing `robots.txt` files with a multi-provider architecture, 
+allowing flexible assembly and generation of robots.txt content.
 
-## 安装
+## Table of Contents
+
+- [Features](#features)
+- [Installation](#installation)
+- [Requirements](#requirements)
+- [Configuration](#configuration)
+- [Usage](#usage)
+  - [Basic Usage](#basic-usage)
+  - [Creating Custom Providers](#creating-custom-providers)
+- [API Reference](#api-reference)
+  - [RobotsTxtDirective](#robotstxtdirective)
+  - [RobotsTxtRule](#robotstxtrule)
+  - [RobotsTxtEntry](#robotstxtentry)
+- [Advanced Usage](#advanced-usage)
+  - [Dynamic Rules](#dynamic-rules)
+  - [Conditional Providers](#conditional-providers)
+- [Testing](#testing)
+- [Contributing](#contributing)
+- [License](#license)
+
+## Features
+
+- 🤖 **Complete robots.txt support**: Support for all standard directives 
+  (User-agent, Allow, Disallow, Crawl-delay, Sitemap, etc.)
+- 🔌 **Multi-provider architecture**: Collect rules from multiple sources by 
+  implementing `RobotsTxtProviderInterface`
+- 🎯 **Priority control**: Support provider priority to flexibly control rule 
+  merging order
+- 🌍 **Environment support**: Provide different robots.txt content based on 
+  different environments
+- ⚡ **Performance optimization**: Built-in caching strategy to reduce server load
+- 📖 **Standards compliant**: Follows 
+  [Google robots.txt specification](https://developers.google.com/search/docs/crawling-indexing/robots/robots_txt)
+- 🔧 **Auto-configuration**: Providers are automatically registered using 
+  Symfony's autoconfiguration
+
+## Installation
 
 ```bash
 composer require tourze/robots-txt-bundle
 ```
 
-## 使用方法
+## Requirements
 
-### 基本用法
+- PHP 8.1 or higher
+- Symfony 6.4 or higher
 
-Bundle 会自动注册 `/robots.txt` 路由，返回生成的 robots.txt 内容。
+## Configuration
 
-### 创建自定义提供者
+The Bundle works out of the box with minimal configuration. The `/robots.txt` 
+route is automatically registered and will collect content from all registered 
+providers.
+
+### Custom Configuration
+
+If you need to customize the Bundle behavior, create a configuration file:
+
+```yaml
+# config/packages/robots_txt.yaml
+robots_txt:
+    cache_enabled: true
+    cache_ttl: 3600
+```
+
+## Usage
+
+### Basic Usage
+
+The Bundle automatically registers a `/robots.txt` route that returns the generated robots.txt content.
+
+### Creating Custom Providers
 
 ```php
 <?php
@@ -41,24 +105,24 @@ class CustomRobotsTxtProvider implements RobotsTxtProviderInterface
     {
         $entry = new RobotsTxtEntry();
 
-        // 添加注释
+        // Add comments
         $entry = $entry->withComment('Custom robots.txt rules');
 
-        // 禁止所有爬虫访问管理区域
+        // Disallow all crawlers from accessing admin areas
         $adminRule = RobotsTxtRule::forAllAgents([
             RobotsTxtDirective::disallow('/admin/'),
             RobotsTxtDirective::disallow('/private/'),
         ]);
         $entry = $entry->withRule($adminRule);
 
-        // 为 Googlebot 设置特殊规则
+        // Set special rules for Googlebot
         $googlebotRule = RobotsTxtRule::forAgent('Googlebot', [
             RobotsTxtDirective::allow('/api/public/'),
             RobotsTxtDirective::crawlDelay(1),
         ]);
         $entry = $entry->withRule($googlebotRule);
 
-        // 添加站点地图
+        // Add sitemap
         $entry = $entry->withSitemap('https://example.com/sitemap.xml');
 
         return $entry;
@@ -66,62 +130,62 @@ class CustomRobotsTxtProvider implements RobotsTxtProviderInterface
 
     public function getPriority(): int
     {
-        return 100; // 高优先级
+        return 100; // High priority
     }
 
     public function supports(): bool
     {
-        // 只在生产环境启用
+        // Only enable in production environment
         return ($_ENV['APP_ENV'] ?? 'prod') === 'prod';
     }
 }
 ```
 
-提供者会自动被注册，无需额外配置。
+Providers are automatically registered without additional configuration.
 
-## API 参考
+## API Reference
 
 ### RobotsTxtDirective
 
-创建单个 robots.txt 指令：
+Create individual robots.txt directives:
 
 ```php
-// Disallow 指令
+// Disallow directive
 RobotsTxtDirective::disallow('/admin/');
 
-// Allow 指令
+// Allow directive
 RobotsTxtDirective::allow('/public/');
 
-// Crawl-delay 指令
+// Crawl-delay directive
 RobotsTxtDirective::crawlDelay(10);
 
-// Sitemap 指令
+// Sitemap directive
 RobotsTxtDirective::sitemap('https://example.com/sitemap.xml');
 
-// 自定义指令
+// Custom directive
 new RobotsTxtDirective('Custom-directive', 'value');
 ```
 
 ### RobotsTxtRule
 
-创建针对特定 User-agent 的规则组：
+Create rule groups for specific User-agents:
 
 ```php
-// 针对所有爬虫
+// For all crawlers
 RobotsTxtRule::forAllAgents([
     RobotsTxtDirective::disallow('/admin/'),
 ]);
 
-// 针对特定爬虫
+// For specific crawlers
 RobotsTxtRule::forAgent('Googlebot', [
     RobotsTxtDirective::allow('/api/'),
     RobotsTxtDirective::crawlDelay(1),
-], 100); // 优先级
+], 100); // Priority
 ```
 
 ### RobotsTxtEntry
 
-完整的 robots.txt 条目：
+Complete robots.txt entry:
 
 ```php
 $entry = new RobotsTxtEntry();
@@ -130,9 +194,9 @@ $entry = $entry->withComment('Generated robots.txt')
                ->withSitemap('https://example.com/sitemap.xml');
 ```
 
-## 高级用法
+## Advanced Usage
 
-### 动态规则
+### Dynamic Rules
 
 ```php
 class DynamicRobotsTxtProvider implements RobotsTxtProviderInterface
@@ -145,7 +209,7 @@ class DynamicRobotsTxtProvider implements RobotsTxtProviderInterface
     {
         $entry = new RobotsTxtEntry();
         
-        // 根据用户数据动态生成规则
+        // Dynamically generate rules based on user data
         $users = $this->userRepository->findPublicUsers();
         foreach ($users as $user) {
             $entry = $entry->withRule(
@@ -160,26 +224,30 @@ class DynamicRobotsTxtProvider implements RobotsTxtProviderInterface
 }
 ```
 
-### 条件性提供者
+### Conditional Providers
 
 ```php
 class ConditionalRobotsTxtProvider implements RobotsTxtProviderInterface
 {
     public function supports(): bool
     {
-        // 只在特定条件下启用
+        // Only enable under specific conditions
         return $_ENV['ENABLE_SEO'] === 'true' && 
                $_ENV['APP_ENV'] === 'prod';
     }
 }
 ```
 
-## 测试
+## Testing
 
 ```bash
-./vendor/bin/phpunit tests
+./vendor/bin/phpunit packages/robots-txt-bundle/tests
 ```
 
-## 许可证
+## Contributing
 
-MIT License - 查看 [LICENSE](LICENSE) 文件了解详情。
+Please see [CONTRIBUTING.md](../../CONTRIBUTING.md) for details on how to contribute to this project.
+
+## License
+
+MIT License - Please see [LICENSE](LICENSE) file for more information.

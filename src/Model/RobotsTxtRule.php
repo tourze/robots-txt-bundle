@@ -8,14 +8,14 @@ namespace Tourze\RobotsTxtBundle\Model;
 class RobotsTxtRule
 {
     /**
-     * @param string $userAgent 用户代理标识符
+     * @param string               $userAgent  用户代理标识符
      * @param RobotsTxtDirective[] $directives 指令列表
-     * @param int $priority 优先级，数字越大优先级越高
+     * @param int                  $priority   优先级，数字越大优先级越高
      */
     public function __construct(
         public readonly string $userAgent,
         public readonly array $directives = [],
-        public readonly int $priority = 0
+        public readonly int $priority = 0,
     ) {
     }
 
@@ -70,12 +70,12 @@ class RobotsTxtRule
      */
     public function toString(): string
     {
-        if (empty($this->directives)) {
+        if (0 === count($this->directives)) {
             return '';
         }
 
         $lines = ['User-agent: ' . $this->userAgent];
-        
+
         foreach ($this->directives as $directive) {
             $lines[] = $directive->toString();
         }

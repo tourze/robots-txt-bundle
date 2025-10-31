@@ -2,13 +2,18 @@
 
 namespace Tourze\RobotsTxtBundle\Tests\Model;
 
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Tourze\RobotsTxtBundle\Model\RobotsTxtDirective;
 use Tourze\RobotsTxtBundle\Model\RobotsTxtRule;
 
-class RobotsTxtRuleTest extends TestCase
+/**
+ * @internal
+ */
+#[CoversClass(RobotsTxtRule::class)]
+final class RobotsTxtRuleTest extends TestCase
 {
-    public function test_constructor_withBasicParameters(): void
+    public function testConstructorWithBasicParameters(): void
     {
         $directives = [RobotsTxtDirective::disallow('/admin/')];
         $rule = new RobotsTxtRule('Googlebot', $directives, 100);
@@ -18,7 +23,7 @@ class RobotsTxtRuleTest extends TestCase
         $this->assertEquals(100, $rule->priority);
     }
 
-    public function test_constructor_withDefaultValues(): void
+    public function testConstructorWithDefaultValues(): void
     {
         $rule = new RobotsTxtRule('*');
 
@@ -27,11 +32,11 @@ class RobotsTxtRuleTest extends TestCase
         $this->assertEquals(0, $rule->priority);
     }
 
-    public function test_forAllAgents_withDirectives(): void
+    public function testForAllAgentsWithDirectives(): void
     {
         $directives = [
             RobotsTxtDirective::disallow('/admin/'),
-            RobotsTxtDirective::disallow('/private/')
+            RobotsTxtDirective::disallow('/private/'),
         ];
         $rule = RobotsTxtRule::forAllAgents($directives, 50);
 
@@ -40,7 +45,7 @@ class RobotsTxtRuleTest extends TestCase
         $this->assertEquals(50, $rule->priority);
     }
 
-    public function test_forAllAgents_withDefaultPriority(): void
+    public function testForAllAgentsWithDefaultPriority(): void
     {
         $directives = [RobotsTxtDirective::allow('/public/')];
         $rule = RobotsTxtRule::forAllAgents($directives);
@@ -50,7 +55,7 @@ class RobotsTxtRuleTest extends TestCase
         $this->assertEquals(0, $rule->priority);
     }
 
-    public function test_forAgent_withSpecificAgent(): void
+    public function testForAgentWithSpecificAgent(): void
     {
         $directives = [RobotsTxtDirective::crawlDelay(10)];
         $rule = RobotsTxtRule::forAgent('Bingbot', $directives, 75);
@@ -60,7 +65,7 @@ class RobotsTxtRuleTest extends TestCase
         $this->assertEquals(75, $rule->priority);
     }
 
-    public function test_withDirective_addsSingleDirective(): void
+    public function testWithDirectiveAddsSingleDirective(): void
     {
         $rule = new RobotsTxtRule('*');
         $directive = RobotsTxtDirective::disallow('/test/');
@@ -72,14 +77,14 @@ class RobotsTxtRuleTest extends TestCase
         $this->assertEquals(0, $newRule->priority);
     }
 
-    public function test_withDirectives_addsMultipleDirectives(): void
+    public function testWithDirectivesAddsMultipleDirectives(): void
     {
         $initialDirectives = [RobotsTxtDirective::allow('/api/')];
         $rule = new RobotsTxtRule('*', $initialDirectives);
-        
+
         $newDirectives = [
             RobotsTxtDirective::disallow('/admin/'),
-            RobotsTxtDirective::crawlDelay(5)
+            RobotsTxtDirective::crawlDelay(5),
         ];
         $newRule = $rule->withDirectives($newDirectives);
 
@@ -88,25 +93,25 @@ class RobotsTxtRuleTest extends TestCase
         $this->assertEquals('*', $newRule->userAgent);
     }
 
-    public function test_toString_withDirectives(): void
+    public function testToStringWithDirectives(): void
     {
         $directives = [
             RobotsTxtDirective::disallow('/admin/'),
             RobotsTxtDirective::allow('/api/'),
-            RobotsTxtDirective::crawlDelay(10)
+            RobotsTxtDirective::crawlDelay(10),
         ];
         $rule = new RobotsTxtRule('Googlebot', $directives);
 
         $expected = "User-agent: Googlebot\n" .
                    "Disallow: /admin/\n" .
                    "Allow: /api/\n" .
-                   "Crawl-delay: 10";
+                   'Crawl-delay: 10';
 
         $this->assertEquals($expected, $rule->toString());
         $this->assertEquals($expected, (string) $rule);
     }
 
-    public function test_toString_withEmptyDirectives(): void
+    public function testToStringWithEmptyDirectives(): void
     {
         $rule = new RobotsTxtRule('*');
 
@@ -114,18 +119,18 @@ class RobotsTxtRuleTest extends TestCase
         $this->assertEquals('', (string) $rule);
     }
 
-    public function test_toString_withAllAgents(): void
+    public function testToStringWithAllAgents(): void
     {
         $directives = [RobotsTxtDirective::disallow('/private/')];
         $rule = RobotsTxtRule::forAllAgents($directives);
 
         $expected = "User-agent: *\n" .
-                   "Disallow: /private/";
+                   'Disallow: /private/';
 
         $this->assertEquals($expected, $rule->toString());
     }
 
-    public function test_withDirective_maintainsImmutability(): void
+    public function testWithDirectiveMaintainsImmutability(): void
     {
         $originalRule = new RobotsTxtRule('TestBot', [RobotsTxtDirective::allow('/test/')], 25);
         $newDirective = RobotsTxtDirective::disallow('/new/');
@@ -143,14 +148,14 @@ class RobotsTxtRuleTest extends TestCase
         $this->assertEquals($newDirective, $newRule->directives[1]);
     }
 
-    public function test_withDirectives_maintainsImmutability(): void
+    public function testWithDirectivesMaintainsImmutability(): void
     {
         $originalDirectives = [RobotsTxtDirective::allow('/original/')];
         $originalRule = new RobotsTxtRule('Bot', $originalDirectives, 10);
-        
+
         $additionalDirectives = [
             RobotsTxtDirective::disallow('/new1/'),
-            RobotsTxtDirective::disallow('/new2/')
+            RobotsTxtDirective::disallow('/new2/'),
         ];
         $newRule = $originalRule->withDirectives($additionalDirectives);
 
@@ -164,4 +169,4 @@ class RobotsTxtRuleTest extends TestCase
         $this->assertEquals($additionalDirectives[0], $newRule->directives[1]);
         $this->assertEquals($additionalDirectives[1], $newRule->directives[2]);
     }
-} 
+}
