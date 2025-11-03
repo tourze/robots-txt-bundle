@@ -18,6 +18,7 @@ class RobotsTxtDirectiveEntity
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER, options: ['comment' => '主键ID'])]
+    /** @phpstan-ignore property.unusedType */
     private ?int $id = null;
 
     #[ORM\Column(type: Types::STRING, length: 50, options: ['comment' => '指令类型'])]

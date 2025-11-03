@@ -22,6 +22,8 @@ use Tourze\RobotsTxtBundle\Entity\RobotsTxtEntryEntity;
 
 /**
  * Robots.txt条目管理控制器
+ *
+ * @extends AbstractCrudController<RobotsTxtEntryEntity>
  */
 #[AdminCrud(routePath: '/robots-txt/entry', routeName: 'robots_txt_entry')]
 final class RobotsTxtEntryEntityCrudController extends AbstractCrudController

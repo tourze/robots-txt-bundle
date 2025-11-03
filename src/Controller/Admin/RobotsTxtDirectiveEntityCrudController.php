@@ -20,6 +20,8 @@ use Tourze\RobotsTxtBundle\Entity\RobotsTxtDirectiveEntity;
 
 /**
  * Robots.txt指令管理控制器
+ *
+ * @extends AbstractCrudController<RobotsTxtDirectiveEntity>
  */
 #[AdminCrud(routePath: '/robots-txt/directive', routeName: 'robots_txt_directive')]
 final class RobotsTxtDirectiveEntityCrudController extends AbstractCrudController
