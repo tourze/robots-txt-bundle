@@ -4,6 +4,7 @@ namespace Tourze\RobotsTxtBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Tourze\BundleDependency\BundleDependencyInterface;
+use Tourze\EasyAdminMenuBundle\EasyAdminMenuBundle;
 use Tourze\RoutingAutoLoaderBundle\RoutingAutoLoaderBundle;
 
 class RobotsTxtBundle extends Bundle implements BundleDependencyInterface
@@ -12,6 +13,7 @@ class RobotsTxtBundle extends Bundle implements BundleDependencyInterface
     {
         return [
             RoutingAutoLoaderBundle::class => ['all' => true],
+            EasyAdminMenuBundle::class => ['all' => true],
         ];
     }
 }
