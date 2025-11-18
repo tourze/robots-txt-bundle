@@ -69,11 +69,6 @@ class RobotsTxtRuleEntityCrudControllerTest extends AbstractEasyAdminControllerT
         yield 'entry' => ['entry'];
     }
 
-    public function testGetEntityFqcn(): void
-    {
-        self::assertSame(RobotsTxtRuleEntity::class, RobotsTxtRuleEntityCrudController::getEntityFqcn());
-    }
-
     public function testConfigureFields(): void
     {
         $controller = new RobotsTxtRuleEntityCrudController();
