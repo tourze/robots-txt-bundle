@@ -7,7 +7,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Tourze\SymfonyDependencyServiceLoader\AutoExtension;
 
-class RobotsTxtExtension extends AutoExtension
+final class RobotsTxtExtension extends AutoExtension
 {
     protected function getConfigDir(): string
     {

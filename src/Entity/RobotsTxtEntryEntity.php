@@ -17,7 +17,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Table(name: 'robots_txt_entry', options: ['comment' => 'Robots.txt条目表'])]
 class RobotsTxtEntryEntity
 {
-    /** @phpstan-ignore property.unusedType */
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER, options: ['comment' => '主键ID'])]
